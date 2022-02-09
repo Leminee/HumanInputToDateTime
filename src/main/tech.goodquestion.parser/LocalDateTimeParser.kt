@@ -1,13 +1,13 @@
 import java.time.LocalDateTime
-import java.time.Period
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.*
-import kotlin.math.abs
+
 
 class LocalDateTimeParser private constructor() {
 
+
     companion object Parser {
+
+        private var localDateTime: LocalDateTime? = null
 
         private val specialDays = mapOf(
 
@@ -24,6 +24,7 @@ class LocalDateTimeParser private constructor() {
             )
 
 
+        @JvmStatic
         fun parse(humanInput: String): LocalDateTime? {
 
 
@@ -70,7 +71,7 @@ class LocalDateTimeParser private constructor() {
                 }
             }
 
-            return LocalDateTime.now()
+            localDateTime = LocalDateTime.now()
                 .plusYears(years)
                 .plusMonths(months)
                 .plusWeeks(weeks)
@@ -78,64 +79,17 @@ class LocalDateTimeParser private constructor() {
                 .plusHours(hours)
                 .plusMinutes(minutes)
                 .plusSeconds(seconds)
+
+            return localDateTime
         }
 
-        fun toGermanFormat(localDateTime: LocalDateTime): String {
+        @JvmStatic
+        fun LocalDateTime.toGermanFormat(): String = this.format(DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm"))
 
-            val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withLocale(Locale.GERMAN)
-
-            return localDateTime.format(dateFormatter)
-        }
 
         private fun removeSpecialCharacters(string: String): String {
 
             return string.replace("[-+^]*".toRegex(), "")
-        }
-
-
-        fun getDurationUntilInSeconds(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.SECONDS.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntilInMinutes(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.MINUTES.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntilInHours(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.HOURS.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntilInDays(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.DAYS.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntilInWeeks(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.WEEKS.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntilInMonths(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.MONTHS.between(LocalDateTime.now(), localDateTime)
-        }
-        
-        fun getDurationUntilInYears(localDateTime: LocalDateTime): Long {
-
-            return ChronoUnit.YEARS.between(LocalDateTime.now(), localDateTime)
-        }
-
-        fun getDurationUntil(localDateTime: LocalDateTime): String {
-
-            val period = Period.between(LocalDateTime.now().toLocalDate(), localDateTime.toLocalDate())
-            val years = abs(period.years)
-            val months = abs(period.months)
-            val days = abs(period.days)
-
-            return "$years years $months months $days days"
         }
 
         fun getSpecialDays(): Set<String> {
